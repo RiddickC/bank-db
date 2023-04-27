@@ -1,6 +1,7 @@
 import mysql.connector
 import db_functions
 import os
+import hide
 
 os.system('cls')
 
@@ -8,7 +9,7 @@ os.system('cls')
 connection = mysql.connector.connect(
     user = 'root',
     database = 'bankdatabase',
-    password = 'Bivl*9876'
+    password = hide.password
 )
 
 cursor = connection.cursor()

@@ -1,11 +1,12 @@
 import mysql.connector
 import random
+import hide
 
 
 connection = mysql.connector.connect(
     user = 'root',
     database = 'bankdatabase',
-    password = 'Bivl*9876'
+    password = hide.password
 )
 cursor = connection.cursor()
 
