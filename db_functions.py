@@ -93,6 +93,7 @@ def close_account():
     acPin = int(input("Enter the Account Pin Number you want to close: "))
     cursor.execute(f"DELETE FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}")
     print("Your account has been deleted and can no longer be accessed.")
+    connection.commit()
 
 def mod_account():
     acID = int(input("Enter the ID of the account you want to modify: "))
