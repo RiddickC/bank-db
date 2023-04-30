@@ -13,10 +13,25 @@ cursor = connection.cursor()
 
 def getAccount():
     os.system('cls')
-    acID = int(input("Enter your Account ID: "))
-    acPin = int(input("Enter your Account Pin Number: "))
+    tempCond = False
+    while True:
+        acID = int(input("Enter your Account ID: "))
+        while True:
+            acPin = int(input("Enter your Account Pin Number (4 digits): "))
+            if len(str(acPin)) > 4 or len(str(acPin)) < 4:
+                print("Not a good enough pin. Please try again.")
+            else:
+                break
+        cursor.execute(f'SELECT EXISTS(SELECT * FROM bankInformation WHERE acID = {acID} AND acPin = {acPin})')
+        for item in cursor:
+            if item[0] == 1:
+                tempCond = True
+                break
+        if tempCond:
+            break
+        print("The ID or Pin Number is incorrect. Try again.")
+        cursor.reset()
     cursor.execute(f'SELECT * FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
-
     return cursor
     
 def balance(acID, acPin):
