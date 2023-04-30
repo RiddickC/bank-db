@@ -9,6 +9,7 @@ hasAccount = None
 acID = None
 acPin = None
 account = None
+user1 = ""
 
 
 connection = mysql.connector.connect(
@@ -27,12 +28,23 @@ while True:
     user0 = input("Do you have an account with us? (yes/no): ")
 
     if user0.lower() == 'no':
-        account = db_functions.create_account()
-        for item in account:
-            acID = item[0]
-            acPin = item[1]
-        hasAccount = False
-        break
+        while True:
+
+            user1 = input("Welcome New User. Would you like to make an account? (Yes/No): ")
+            if user1.lower() == 'yes':
+                account = db_functions.create_account()
+                for item in account:
+                    acID = item[0]
+                    acPin = item[1]
+                hasAccount = False
+                break
+            elif user1.lower() == 'no':
+                break
+            else:
+                print("Try again.")
+        print()
+        if user1.lower() == 'no':
+            break
     elif user0.lower() == 'yes':
         account = db_functions.getAccount()
         for item in account:
@@ -47,6 +59,8 @@ while True:
 
 while True:
     if user0.lower() == 'exit':
+        break
+    if user1.lower() == 'no':
         break
     if hasAccount == True:
         if db_functions.check_admin(acID, acPin):
