@@ -1,6 +1,7 @@
 import mysql.connector
 import random
 import hide
+import os
 
 
 connection = mysql.connector.connect(
@@ -10,21 +11,25 @@ connection = mysql.connector.connect(
 )
 cursor = connection.cursor()
 
-def balance():
-
+def getAccount():
+    os.system('cls')
     acID = int(input("Enter your Account ID: "))
     acPin = int(input("Enter your Account Pin Number: "))
+    cursor.execute(f'SELECT * FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
 
+    return cursor
+    
+def balance(acID, acPin):
+    os.system('cls')
     cursor.execute(f'SELECT bal FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
     for item in cursor:
         print(f'Balance: ${item[0]}')
     print()
 
-def deposit():
-    acID = int(input("Enter your Account ID: "))
-    acPin = int(input("Enter your Account Pin Number: "))
+def deposit(acID, acPin):
+    os.system('cls')
     while True:
-        amount = int(input("How much would you like to deposit into your account? "))
+        amount = int(input("How much would you like to deposit into your account?: "))
         if amount < 0:
             print("Can't deposit nothing.")
         else:
@@ -37,14 +42,13 @@ def deposit():
     print()
     connection.commit()
 
-def withdraw():
-    acID = int(input("Enter your Account ID: "))
-    acPin = int(input("Enter your Account Pin Number: "))
+def withdraw(acID, acPin):
+    os.system('cls')
     cursor.execute(f'SELECT bal FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
     for item in cursor:
         bal = item[0]
     while True:
-        amount = int(input("How much would you like to withdraw from your account? "))
+        amount = int(input("How much would you like to withdraw from your account?: "))
         if amount > bal:
             print("You cannot withdraw that amount. Please try again.")
         else:
@@ -59,6 +63,7 @@ def withdraw():
     connection.commit()
 
 def create_account():
+    os.system('cls')
     acName = input("What is your name for the account?: ")
     acAddress = input("What is your address for the account?: ")
     acDOB = input("What is your date of birth for the account? (mm/dd/yyyy): ")
@@ -88,16 +93,23 @@ def create_account():
     cursor.execute(f"INSERT INTO bankInformation (acID, acPin, bal, name, address, dob) VALUES ({acID}, {acPin}, {amount}, {acName}, {acAddress}, {acDOB})")
     print()
 
-def close_account():
-    acID = int(input("Enter the Account ID you want to close: "))
-    acPin = int(input("Enter the Account Pin Number you want to close: "))
-    cursor.execute(f"DELETE FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}")
-    print("Your account has been deleted and can no longer be accessed.")
-    connection.commit()
+def close_account(acID, acPin):
+    os.system('cls')
+    while True:
+        user = input("Are you sure you want to close this account? (yes/no): ")
+        if user.lower() == 'yes':
+            cursor.execute(f"DELETE FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}")
+            print("Your account has been deleted and can no longer be accessed.")
+            connection.commit()
+            break
+        elif user.lower() == 'no':
+            print("Your account was not closed.")
+            break
+        else:
+            print("Try again.")
 
-def mod_account():
-    acID = int(input("Enter the ID of the account you want to modify: "))
-    acPin = int(input("Enter the Pin number of the account you want to modify: "))
+def mod_account(acID):
+    os.system('cls')
     while True:
         user = input("What would u like to modify about the account? (Pin number, Name, Address, Date of Birth): ")
         if user.lower() == "pin number":
@@ -123,4 +135,141 @@ def mod_account():
             break
         else:
             print("Please try again.")
-    print("Account has been modified.")
+    print("Account has been modified.")\
+    
+def check_admin(acID, acPin):
+    admin = False
+    cursor.execute(f'SELECT admin FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
+    for item in cursor:
+        if item[0] == 'yes':
+            admin = True
+        else:
+            admin = False
+        
+    return admin
+def main_admin_or_new(acID,acPin):
+    os.system('cls')
+    while True:
+        user = input("What are you here for today? (depsoit, withdrawal, balance, create account, close account, modify account): ")
+        if user.lower() == "balance":
+            balance(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "deposit":
+            deposit(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "withdrawal":
+            withdraw(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "create account":
+            create_account()
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "close account":
+            close_account(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "modify account":
+            mod_account(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "exit":
+            break
+        else:
+            print("Try again.")
+
+def main_user(acID,acPin):
+    os.system('cls')
+    while True:
+        user = input("What are you here for today? (depsoit, withdrawal, balance): ")
+        if user.lower() == "balance":
+            balance(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "deposit":
+            deposit(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "withdrawal":
+            withdraw(acID,acPin)
+            while True:
+                user2 = input("Would you like to exit? (Yes/No): ")
+                if user2.lower() == "yes":
+                    break
+                elif user2.lower() == "no":
+                    break
+                else:
+                    print("Please try again.")
+            if user2.lower() == "yes":
+                break
+        elif user.lower() == "exit":
+            break
+        else:
+            print("Try again.")
+            

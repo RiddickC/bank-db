@@ -5,6 +5,11 @@ import hide
 
 os.system('cls')
 
+hasAccount = None
+acID = None
+acPin = None
+account = None
+
 
 connection = mysql.connector.connect(
     user = 'root',
@@ -18,84 +23,36 @@ print("-----WELCOME TO THEE BANK-----")
 print("-----If you wish to exit-----")
 print("---------Type (exit)---------")
 
-while True:
-    user = input("What are you here for today? (depsoit, withdrawal, create account, balance, close account, modify account): ")
-    if user.lower() == "balance":
-        db_functions.balance()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "deposit":
-        db_functions.deposit()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "withdrawal":
-        db_functions.withdraw()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "create account":
-        db_functions.create_account()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "close account":
-        db_functions.close_account()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "modify account":
-        db_functions.mod_account()
-        while True:
-            user2 = input("Would you like to exit? (Yes/No): ")
-            if user2.lower() == "yes":
-                break
-            elif user2.lower() == "no":
-                break
-            else:
-                print("Please try again.")
-        if user2.lower() == "yes":
-            break
-    elif user.lower() == "exit":
+while True: 
+    user0 = input("Do you have an account with us? (yes/no): ")
+
+    if user0.lower() == 'no':
+        account = db_functions.create_account()
+        for item in account:
+            acID = item[0]
+            acPin = item[1]
+        hasAccount = False
+        break
+    elif user0.lower() == 'yes':
+        account = db_functions.getAccount()
+        for item in account:
+            acID = item[0]
+            acPin = item[1]
+        hasAccount = True
         break
     else:
         print("Try again.")
+
+
+
+if hasAccount == True:
+    if db_functions.check_admin(acID, acPin):
+        db_functions.main_admin_or_new(acID,acPin)
+    else:
+        db_functions.main_user(acID,acPin)
+elif hasAccount == False:
+    db_functions.main_admin_or_new(acID,acPin)
+
 print("Thank you for your time. :)")
 
 
