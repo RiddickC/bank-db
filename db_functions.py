@@ -83,18 +83,30 @@ def create_account():
             break
         else:
             print("Please try again.")
+    temp = None
     while True:
         acID = random.randint(10000, 99999)
-        check = cursor.execute(f'SELECT bal FROM bankInformation WHERE acID = {acID}')
-        if(check is None):
-            break
-        else: 
+        cursor.execute("SELECT * FROM bankInformation")
+        for item in cursor:
+            if item[0] == acID:
+                temp = acID
+                break
+        if temp == acID:
             continue
-    cursor.execute(f"INSERT INTO bankInformation (acID, acPin, bal, name, address, dob) VALUES ({acID}, {acPin}, {amount}, {acName}, {acAddress}, {acDOB})")
+        else:
+            break
+    cursor.execute(f"INSERT INTO bankInformation (acID, acPin, bal, name, address, dob) VALUES ({acID}, {acPin}, {amount}, \"{acName}\", \"{acAddress}\", \"{acDOB}\")")
     print()
+    print("Successfully created your new account!")
+    cursor.execute(f'SELECT * FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
+    print()
+    connection.commit()
+    return cursor
 
-def close_account(acID, acPin):
+def close_account():
     os.system('cls')
+    acID = int(input("Enter the Account ID for the account you want to close: "))
+    acPin = int(input("Enter the Account Pin Number for the account you want to close: "))
     while True:
         user = input("Are you sure you want to close this account? (yes/no): ")
         if user.lower() == 'yes':
@@ -108,8 +120,10 @@ def close_account(acID, acPin):
         else:
             print("Try again.")
 
-def mod_account(acID):
+def mod_account():
     os.system('cls')
+    acID = int(input("Enter the Account ID for the account you want to modify: "))
+    acPin = int(input("Enter the Account Pin Number for the account you want to modify: "))
     while True:
         user = input("What would u like to modify about the account? (Pin number, Name, Address, Date of Birth): ")
         if user.lower() == "pin number":
@@ -119,23 +133,24 @@ def mod_account(acID):
                     print("Not a good enough pin. Please try again.")
                 else:
                     break
-            cursor.execute(f'UPDATE bankInformation SET acPin = {userPin} WHERE acID = {acID}')
+            cursor.execute(f'UPDATE bankInformation SET acPin = {userPin} WHERE acID = {acID} AND acPin = {acPin}')
             break
         elif user.lower() == "name":
             userName = input("What would you like the new name to be?: ")
-            cursor.execute(f'UPDATE bankInformation SET name = {userName} WHERE acID = {acID}')
+            cursor.execute(f'UPDATE bankInformation SET name = \"{userName}\" WHERE acID = {acID} AND acPin = {acPin}')
             break
         elif user.lower() == "address":
             userAddr = input("What would you like the new address to be?: ")
-            cursor.execute(f'UPDATE bankInformation SET address = {userAddr} WHERE acID = {acID}')
+            cursor.execute(f'UPDATE bankInformation SET address = \"{userAddr}\" WHERE acID = {acID} AND acPin = {acPin}')
             break
         elif user.lower() == "date of birth":
             userDOB = input("What would you like the new Date of Birth to be?: ")
-            cursor.execute(f'UPDATE bankInformation SET dob = {userDOB} WHERE acID = {acID}')
+            cursor.execute(f'UPDATE bankInformation SET dob = \"{userDOB}\" WHERE acID = {acID} AND acPin = {acPin}')
             break
         else:
             print("Please try again.")
-    print("Account has been modified.")\
+    print("Account has been modified.")
+    connection.commit()
     
 def check_admin(acID, acPin):
     admin = False
@@ -144,11 +159,10 @@ def check_admin(acID, acPin):
         if item[0] == 'yes':
             admin = True
         else:
-            admin = False
-        
+            admin = False 
     return admin
+
 def main_admin_or_new(acID,acPin):
-    os.system('cls')
     while True:
         user = input("What are you here for today? (depsoit, withdrawal, balance, create account, close account, modify account): ")
         if user.lower() == "balance":
@@ -163,6 +177,7 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "deposit":
             deposit(acID,acPin)
             while True:
@@ -175,6 +190,7 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "withdrawal":
             withdraw(acID,acPin)
             while True:
@@ -187,6 +203,7 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "create account":
             create_account()
             while True:
@@ -199,8 +216,9 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "close account":
-            close_account(acID,acPin)
+            close_account()
             while True:
                 user2 = input("Would you like to exit? (Yes/No): ")
                 if user2.lower() == "yes":
@@ -211,8 +229,9 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "modify account":
-            mod_account(acID,acPin)
+            mod_account()
             while True:
                 user2 = input("Would you like to exit? (Yes/No): ")
                 if user2.lower() == "yes":
@@ -223,13 +242,13 @@ def main_admin_or_new(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "exit":
             break
         else:
             print("Try again.")
 
 def main_user(acID,acPin):
-    os.system('cls')
     while True:
         user = input("What are you here for today? (depsoit, withdrawal, balance): ")
         if user.lower() == "balance":
@@ -244,6 +263,7 @@ def main_user(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "deposit":
             deposit(acID,acPin)
             while True:
@@ -256,6 +276,7 @@ def main_user(acID,acPin):
                     print("Please try again.")
             if user2.lower() == "yes":
                 break
+            cursor.reset()
         elif user.lower() == "withdrawal":
             withdraw(acID,acPin)
             while True:
@@ -266,6 +287,7 @@ def main_user(acID,acPin):
                     break
                 else:
                     print("Please try again.")
+            cursor.reset()
             if user2.lower() == "yes":
                 break
         elif user.lower() == "exit":
