@@ -41,6 +41,7 @@ def deposit(acID, acPin):
         print(f'Balance: ${item[0]}')
     print()
     connection.commit()
+    
 
 def withdraw(acID, acPin):
     os.system('cls')
@@ -96,11 +97,12 @@ def create_account():
         else:
             break
     cursor.execute(f"INSERT INTO bankInformation (acID, acPin, bal, name, address, dob) VALUES ({acID}, {acPin}, {amount}, \"{acName}\", \"{acAddress}\", \"{acDOB}\")")
+    connection.commit()
+    cursor.reset()
     print()
     print("Successfully created your new account!")
     cursor.execute(f'SELECT * FROM bankInformation WHERE acID = {acID} AND acPin = {acPin}')
     print()
-    connection.commit()
     return cursor
 
 def close_account():
@@ -159,7 +161,7 @@ def check_admin(acID, acPin):
         if item[0] == 'yes':
             admin = True
         else:
-            admin = False 
+            admin = False
     return admin
 
 def main_admin_or_new(acID,acPin):

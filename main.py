@@ -40,18 +40,22 @@ while True:
             acPin = item[1]
         hasAccount = True
         break
+    elif user0.lower() == 'exit':
+        break
     else:
         print("Try again.")
 
-
-
-if hasAccount == True:
-    if db_functions.check_admin(acID, acPin):
-        db_functions.main_admin_or_new(acID,acPin)
+while True:
+    if user0.lower() == 'exit':
+        break
+    if hasAccount == True:
+        if db_functions.check_admin(acID, acPin):
+            db_functions.main_admin_or_new(acID,acPin)
+        else:
+            db_functions.main_user(acID,acPin)
     else:
-        db_functions.main_user(acID,acPin)
-elif hasAccount == False:
-    db_functions.main_admin_or_new(acID,acPin)
+        db_functions.main_admin_or_new(acID,acPin)
+    break
 
 print("Thank you for your time. :)")
 
